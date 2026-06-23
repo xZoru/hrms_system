@@ -4,7 +4,13 @@
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 {{ __('User Management') }}
             </h2>
-            <span class="text-sm text-gray-500 dark:text-gray-400">🔑 Super Admin Only</span>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm text-gray-500 dark:text-gray-400">🔑 Super Admin Only</span>
+                <a href="{{ route('admin.users.create') }}" 
+                   class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition">
+                    + Add User
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -76,7 +82,7 @@
                                             @method('DELETE')
                                             <button type="submit" 
                                                     class="inline-block px-3 py-1 text-xs font-medium text-red-600 dark:text-red-400 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
-                                                    onclick="return confirm('Delete this user?')">
+                                                    onclick="return confirm('Are you sure you want to delete this user?')">
                                                 Delete
                                             </button>
                                         </form>
@@ -84,7 +90,9 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="7" class="px-4 py-4 text-center text-gray-500">No users found.</td>
+                                    <td colspan="7" class="px-4 py-4 text-center text-gray-500 dark:text-gray-400">
+                                        No users found.
+                                    </td>
                                 </tr>
                                 @endforelse
                             </tbody>

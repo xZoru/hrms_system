@@ -16,10 +16,40 @@ class UserController extends Controller
         return view('admin.users.index', compact('users'));
     }
 
+    public function create()
+    {
+        $companies = Company::on('mysql')->get();
+        $allCompanyIds = $companies->pluck('id')->toArray();
+
+        return view('admin.users.create', compact('companies', 'allCompanyIds'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|in:super_admin,admin,hr_manager,payroll_officer,employee',
+            'company_id' => 'nullable|exists:companies,id',
+            'allowed_companies' => 'nullable|array',
+            'allowed_companies.*' => 'exists:companies,id',
+        ]);
+
+        $validated['password'] = Hash::make($request->password);
+        $validated['allowed_companies'] = $request->allowed_companies ?? [];
+
+        $user = User::on('mysql')->create($validated);
+
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', 'User created successfully!');
+    }
+
     public function edit($id)
     {
         $user = User::on('mysql')->findOrFail($id);
-        $companies = Company::on('mysql')->get(); // ✅ USE get() NOT all()
+        $companies = Company::on('mysql')->get();
         $allCompanyIds = $companies->pluck('id')->toArray();
 
         return view('admin.users.edit', compact('user', 'companies', 'allCompanyIds'));
