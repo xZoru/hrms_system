@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class EmployeeBankAccount extends Model
 {
     use HasFactory;
-
+    protected $connection = 'company';
     protected $fillable = [
         'employee_id',
         'account_name',

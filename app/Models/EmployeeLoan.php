@@ -6,4 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class EmployeeLoan extends Model
 {
+    protected $connection = 'company';
 }

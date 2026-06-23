@@ -9,6 +9,7 @@ use Carbon\Carbon;
 class Employee extends Model
 {
     use HasFactory;
+    protected $connection = 'mysql';
 
     protected $fillable = [
         'employee_number',
@@ -35,7 +36,11 @@ class Employee extends Model
         'visa_number',
         'visa_expiry_date',
         'is_active',
-        'payment_method'
+        'payment_method',
+        'workshift',
+        'allowance',
+        'default_pay',
+        'nasfund_collect',
     ];
 
     protected $casts = [
