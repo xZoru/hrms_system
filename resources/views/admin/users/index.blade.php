@@ -7,7 +7,7 @@
             <div class="flex items-center space-x-4">
                 <span class="text-sm text-gray-500 dark:text-gray-400">🔑 Super Admin Only</span>
                 <a href="{{ route('admin.users.create') }}" 
-                   class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition">
+                        style="background-color: #dc2626; color: #ffffff !important; font-weight: 700; padding: 8px 16px; border-radius: 8px; text-decoration: none; display: inline-block;">
                     + Add User
                 </a>
             </div>

@@ -63,6 +63,7 @@ class EmployeeController extends Controller
             'nasfund_number' => 'nullable|string|max:100',
             'payment_method' => 'required|in:bank_transfer,cash',
             'is_active' => 'boolean',
+            'monthly_rate' => 'nullable|numeric|min:0',
         ]);
 
         $validated['is_active'] = $request->has('is_active');

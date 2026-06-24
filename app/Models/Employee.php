@@ -24,6 +24,7 @@ class Employee extends Model
         'joining_date',
         'end_date',
         'base_salary',
+        'monthly_rate',
         'hourly_rate',
         'nasfund_number',
         'nasfund_dependents',
@@ -54,6 +55,7 @@ class Employee extends Model
         'is_active' => 'boolean',
         'nasfund_dependents' => 'array',
         'base_salary' => 'decimal:2',
+        'monthly_rate' => 'decimal:2',
         'hourly_rate' => 'decimal:2',
     ];
 
@@ -123,6 +125,18 @@ class Employee extends Model
     public function isNational()
     {
         return $this->classification_id === 1;
+    }
+
+    public function getFortnightlyRateAttribute()
+    {
+        return $this->monthly_rate * 12 / 26;
+    }
+
+    public function getHourlyRateAttribute()
+    {
+        $company = $this->company;
+        $standardHours = $company->standard_hours_per_fortnight ?? 84;
+        return $this->fortnightly_rate / $standardHours;
     }
 
     public function getLeaveBalance()

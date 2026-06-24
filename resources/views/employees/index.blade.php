@@ -23,7 +23,6 @@
                         </div>
                     @endif
 
-                    <!-- ===== EMPLOYEE TABLE ===== -->
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left text-gray-700 dark:text-gray-300">
                             <thead class="text-xs uppercase bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300">
@@ -94,9 +93,9 @@
                                         </span>
                                     </td>
 
-                                    <!-- Hourly Rate -->
+                                    <!-- Fortnightly Rate -->
                                     <td class="px-3 py-3 font-medium text-gray-900 dark:text-white">
-                                        K{{ number_format($employee->hourly_rate, 2) }}
+                                        K{{ number_format($employee->fortnightly_rate, 2) }}
                                     </td>
 
                                     <!-- Allowance -->
@@ -119,19 +118,19 @@
                                     <!-- Actions -->
                                     <td class="px-3 py-3 whitespace-nowrap text-center">
                                         <a href="{{ route('employees.show', $employee) }}" 
-                                           class="inline-block px-2.5 py-1 text-xs font-medium text-blue-600 dark:text-blue-400">
+                                           class="inline-block px-2.5 py-1 text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline">
                                             View
                                         </a>
                                         <a href="{{ route('employees.edit', $employee) }}" 
-                                           class="inline-block px-2.5 py-1 text-xs font-medium text-amber-600 dark:text-amber-400">
+                                           class="inline-block px-2.5 py-1 text-xs font-medium text-amber-600 dark:text-amber-400 hover:underline">
                                             Edit
                                         </a>
                                         <form action="{{ route('employees.destroy', $employee) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" 
-                                                    class="inline-block px-2.5 py-1 text-xs font-medium text-red-600 dark:text-red-400"
-                                                    onclick="return confirm('Are you sure?')">
+                                                    class="inline-block px-2.5 py-1 text-xs font-medium text-red-600 dark:text-red-400 hover:underline"
+                                                    onclick="return confirm('Are you sure you want to delete this employee?')">
                                                 Delete
                                             </button>
                                         </form>

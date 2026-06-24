@@ -3,7 +3,7 @@
         <div class="max-w-md w-full">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-2xl">
                 <div class="p-8">
-                    <!-- Header -->
+                    
                     <div class="text-center mb-8">
                         <div class="inline-block p-4 bg-red-100 dark:bg-red-900/30 rounded-full mb-4">
                             <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -18,7 +18,7 @@
                         </p>
                     </div>
 
-                    <!-- Company List -->
+                    
                     <form method="POST" action="{{ route('company.select') }}">
                         @csrf
                         <div class="space-y-3">
@@ -51,7 +51,6 @@
                         </div>
                     </form>
 
-                    <!-- Logout Link -->
                     <div class="mt-6 text-center">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

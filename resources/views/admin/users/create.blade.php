@@ -20,7 +20,7 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                            <!-- Name -->
+                            
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
                                 <input type="text" name="name" value="{{ old('name') }}" 
@@ -28,7 +28,7 @@
                                 @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
 
-                            <!-- Email -->
+                            
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
                                 <input type="email" name="email" value="{{ old('email') }}" 
@@ -36,7 +36,7 @@
                                 @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
 
-                            <!-- Password -->
+                            
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
                                 <input type="password" name="password" 
@@ -44,14 +44,14 @@
                                 @error('password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
 
-                            <!-- Confirm Password -->
+                            
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
                                 <input type="password" name="password_confirmation" 
                                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500">
                             </div>
 
-                            <!-- Role -->
+                            
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
                                 <select name="role" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500">
@@ -64,7 +64,7 @@
                                 @error('role') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
 
-                            <!-- Default Company -->
+                            
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Default Company</label>
                                 <select name="company_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500">
@@ -78,7 +78,7 @@
                                 @error('company_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
 
-                            <!-- Allowed Companies -->
+                            
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     Allowed Companies (Multi-Company Access)

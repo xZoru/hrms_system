@@ -6,15 +6,15 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Fonts -->
+    
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
 
-    <!-- Scripts -->
+    
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        /* ===== THEME VARIABLES ===== */
+        
         :root {
             --bg-primary: #f8fafc;
             --bg-secondary: #ffffff;
@@ -89,7 +89,7 @@
             --glass-border: rgba(255,255,255,0.08);
         }
 
-        /* ===== GLOBAL STYLES ===== */
+        
         * {
             transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
@@ -100,7 +100,7 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* ===== LAYOUT ===== */
+        
         .bg-white {
             background-color: var(--bg-secondary) !important;
         }
@@ -114,7 +114,7 @@
             background-color: var(--bg-nav) !important;
         }
 
-        /* ===== TEXT COLORS ===== */
+        
         .text-gray-800, .text-gray-900, .text-dark {
             color: var(--text-primary) !important;
         }
@@ -128,7 +128,7 @@
             color: var(--text-white) !important;
         }
 
-        /* ===== BORDERS ===== */
+        
         .border-gray-100, .border-gray-200, .border-gray-300 {
             border-color: var(--border-color) !important;
         }
@@ -136,12 +136,12 @@
             border-color: var(--border-color) !important;
         }
 
-        /* ===== SHADOWS ===== */
+        
         .shadow-sm, .shadow, .shadow-md, .shadow-lg {
             box-shadow: 0 1px 3px 0 var(--shadow-color), 0 1px 2px -1px var(--shadow-color) !important;
         }
 
-        /* ===== LINKS ===== */
+        
         a:not(.no-theme) {
             color: var(--text-link) !important;
         }
@@ -157,7 +157,7 @@
             background-color: #b91c1c !important;
         }
 
-        /* ===== INPUTS ===== */
+        
         input, select, textarea {
             background-color: var(--bg-input) !important;
             color: var(--text-primary) !important;
@@ -171,7 +171,7 @@
             box-shadow: 0 0 0 3px rgba(220,38,38,0.1) !important;
         }
 
-        /* ===== SUCCESS / ERROR ===== */
+        
         .bg-green-100 {
             background-color: var(--success-bg) !important;
             color: var(--success-text) !important;
@@ -189,7 +189,7 @@
             color: var(--error-text) !important;
         }
 
-        /* ===== TABLES ===== */
+        
         table {
             background-color: var(--bg-table) !important;
         }
@@ -212,19 +212,19 @@
             background-color: var(--bg-hover) !important;
         }
 
-        /* ===== DROPDOWN ===== */
+        
         .dropdown-content {
             background-color: var(--bg-dropdown) !important;
             border-color: var(--border-color) !important;
         }
 
-        /* ===== NAVIGATION ===== */
+        
         nav, .nav-bar {
             background-color: var(--bg-nav) !important;
             border-color: var(--border-color) !important;
         }
 
-        /* ===== HEADERS ===== */
+        
         header {
             background-color: var(--bg-header) !important;
             border-color: var(--border-color) !important;
@@ -233,7 +233,7 @@
             color: var(--text-primary) !important;
         }
 
-        /* ===== HOVER STATES ===== */
+        
         .hover\:bg-gray-50:hover {
             background-color: var(--bg-hover) !important;
         }
@@ -247,7 +247,7 @@
             color: var(--text-primary) !important;
         }
 
-        /* ===== GLASS ===== */
+        
         .glass-card {
             background: var(--glass-bg) !important;
             backdrop-filter: blur(10px) !important;
@@ -255,7 +255,7 @@
             border: 1px solid var(--glass-border) !important;
         }
 
-        /* ===== RESPONSIVE ===== */
+        
         @media (max-width: 480px) {
             .glass-container {
                 padding: 28px 20px;
@@ -279,7 +279,7 @@
             </header>
         @endif
 
-        <!-- Page Content -->
+        
         <main>
             {{ $slot }}
         </main>

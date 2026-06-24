@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class EmployeeBankAccount extends Model
 {
     use HasFactory;
-    protected $connection = 'company';
+
+    protected $connection = 'mysql';
+
     protected $fillable = [
         'employee_id',
         'account_name',
@@ -16,7 +18,7 @@ class EmployeeBankAccount extends Model
         'bank_name',
         'bsb_code',
         'is_preferred',
-        'is_active'
+        'is_active',
     ];
 
     protected $casts = [
@@ -27,5 +29,18 @@ class EmployeeBankAccount extends Model
     public function employee()
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($account) {
+            if ($account->is_preferred) {
+                static::where('employee_id', $account->employee_id)
+                    ->where('id', '!=', $account->id)
+                    ->update(['is_preferred' => false]);
+            }
+        });
     }
 }
