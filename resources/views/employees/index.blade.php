@@ -34,7 +34,7 @@
                                     <th class="px-3 py-3">Workshift</th>
                                     <th class="px-3 py-3">Department</th>
                                     <th class="px-3 py-3">Status</th>
-                                    <th class="px-3 py-3">Fortnightly Rate</th>
+                                    <th class="px-3 py-3">FN Hourly Rate</th>
                                     <th class="px-3 py-3">Allowance</th>
                                     <th class="px-3 py-3">Default Pay</th>
                                     <th class="px-3 py-3">NASFUND Collect?</th>
@@ -95,9 +95,8 @@
 
                                     <!-- Fortnightly Rate -->
                                     <td class="px-3 py-3 font-medium text-gray-900 dark:text-white">
-                                        K{{ number_format($employee->fortnightly_rate, 2) }}
+                                        K{{ number_format($employee->fn_hourly_rate, 2) }}
                                     </td>
-
                                     <!-- Allowance -->
                                     <td class="px-3 py-3 text-gray-700 dark:text-gray-300">
                                         {{ $employee->allowance ?? 'N/A' }}

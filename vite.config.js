@@ -8,4 +8,12 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        host: true,           // Allow external access
+        cors: true,           // Enable CORS
+        hmr: {
+            host: 'localhost',
+            port: 5173,
+        },
+    },
 });

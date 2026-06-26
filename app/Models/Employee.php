@@ -42,6 +42,8 @@ class Employee extends Model
         'allowance',
         'default_pay',
         'nasfund_collect',
+        'pay_raise',
+        'pay_raise_date',
     ];
 
     protected $casts = [
@@ -127,16 +129,21 @@ class Employee extends Model
         return $this->classification_id === 1;
     }
 
-    public function getFortnightlyRateAttribute()
+    public function getFnHourlyRateAttribute()
     {
-        return $this->monthly_rate * 12 / 26;
+        $company = $this->company;
+        $standardHours = $company->standard_hours_per_fortnight ?? 84;
+        $monthlyRate = ($this->monthly_rate ?? 0) + ($this->pay_raise ?? 0);
+        $fortnightlyRate = $monthlyRate * 12 / 26;
+        return $fortnightlyRate / $standardHours;
     }
-
     public function getHourlyRateAttribute()
     {
         $company = $this->company;
         $standardHours = $company->standard_hours_per_fortnight ?? 84;
-        return $this->fortnightly_rate / $standardHours;
+        $monthlyRate = ($this->monthly_rate ?? 0) + ($this->pay_raise ?? 0);
+        $fortnightlyRate = $monthlyRate * 12 / 26;
+        return $fortnightlyRate / $standardHours;;
     }
 
     public function getLeaveBalance()

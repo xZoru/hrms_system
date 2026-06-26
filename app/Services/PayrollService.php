@@ -6,72 +6,139 @@ use App\Models\Employee;
 use App\Models\Payroll;
 use App\Models\PayrollItem;
 use App\Models\Company;
+use App\Models\TaxRate;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class PayrollService
 {
-    public function calculatePayroll($employee, $periodStart, $periodEnd)
+    /**
+     * Calculate payroll for a single employee
+     * Both nationals and expats use the same tax table
+     */
+    public function calculatePayroll($employee, $periodStart, $periodEnd, $overtimeHours = 0, $sundayHours = 0, $holidayHours = 0, $leavePay = 0, $otherAllowances = 0, $cashAdvance = 0, $otherDeductions = 0)
     {
-        $company = $employee->company;
+        $company = Company::on('mysql')->find($employee->company_id);
         $standardHours = $company->standard_hours_per_fortnight ?? 84;
-        $hourlyRate = $employee->hourly_rate ?? 0;
 
-        $regularPay = $standardHours * $hourlyRate;
-        $overtimeHours = 0;
+        $monthlyRate = ($employee->monthly_rate ?? 0) + ($employee->pay_raise ?? 0);
+        $fortnightlyRate = $monthlyRate * 12 / 26;
+        $hourlyRate = $fortnightlyRate / $standardHours;
+
+        $fnRate = $fortnightlyRate;
+        $basicPay = $fnRate;
+        $regularPay = $basicPay;
+
         $overtimePay = $overtimeHours * ($hourlyRate * 1.5);
-        $holidayPay = 0;
-        $sundayPay = 0;
-        $allowance = $employee->allowance ?? 0;
+        $sundayPay = $sundayHours * ($hourlyRate * 2);
+        $holidayPay = $holidayHours * ($hourlyRate * 2);
+        $leavePay = $leavePay;
+        $otherAllowances = $otherAllowances;
 
-        $grossPay = $regularPay + $overtimePay + $holidayPay + $sundayPay + $allowance;
-        $tax = $this->calculateTax($employee, $grossPay);
+        $grossTotal = $regularPay + $overtimePay + $sundayPay + $holidayPay + $leavePay + $otherAllowances;
 
+        $npfPercent = 6.00;
         $nasfundEnabled = $employee->nasfund_collect !== 'NO';
-        $nasfundEE = $nasfundEnabled ? $grossPay * 0.06 : 0;
-        $nasfundER = $nasfundEnabled ? $grossPay * 0.084 : 0;
-        $loanDeduction = 0;
+        $ncsl = $nasfundEnabled ? $grossTotal * ($npfPercent / 100) : 0;
+        $nasfundER = $nasfundEnabled ? $grossTotal * 0.084 : 0;
 
-        $netPay = $grossPay - $tax - $nasfundEE - $loanDeduction;
+        // TAX CALCULATION - SAME FOR BOTH NATIONAL AND EXPAT
+        // Tax is calculated on FN RATE (fortnightly rate), not gross total
+        $tax = $this->calculateTax($employee, $fnRate);
+
+        $netPay = $grossTotal - $tax - $ncsl - $cashAdvance - $otherDeductions;
 
         return [
             'employee_id' => $employee->id,
-            'regular_hours' => $standardHours,
-            'overtime_hours' => $overtimeHours,
-            'hourly_rate' => $hourlyRate,
+            'fn_rate' => $fnRate,
+            'basic_pay' => $basicPay,
             'regular_pay' => $regularPay,
             'overtime_pay' => $overtimePay,
-            'holiday_pay' => $holidayPay,
             'sunday_pay' => $sundayPay,
-            'allowance' => $allowance,
-            'gross_pay' => $grossPay,
+            'holiday_pay' => $holidayPay,
+            'leave_pay' => $leavePay,
+            'other_allowances' => $otherAllowances,
+            'gross_pay' => $grossTotal,
             'tax' => $tax,
-            'nasfund_enabled' => $nasfundEnabled,
-            'nasfund_ee' => $nasfundEE,
+            'npf_percent' => $npfPercent,
+            'ncsl' => $ncsl,
+            'nasfund_ee' => $ncsl,
             'nasfund_er' => $nasfundER,
-            'loan_deduction' => $loanDeduction,
+            'cash_advance' => $cashAdvance,
+            'other_deductions' => $otherDeductions,
             'net_pay' => $netPay,
+            'payment_method' => $employee->payment_method,
         ];
     }
 
-    public function calculateTax($employee, $grossPay)
-    {
-        $taxRates = [
-            ['min' => 0, 'max' => 1000, 'rate' => 0],
-            ['min' => 1000, 'max' => 5000, 'rate' => 0.10],
-            ['min' => 5000, 'max' => 15000, 'rate' => 0.20],
-            ['min' => 15000, 'max' => null, 'rate' => 0.30],
-        ];
+    /**
+     * Calculate tax based on FN RATE
+     * SAME for both National and Expatriate employees
+     * 
+     * PNG Tax Table (Fortnightly):
+     * - 0%: 0 - 769.00
+     * - 30%: 769.01 - 1,269.00
+     * - 35%: 1,269.01 - 2,692.00
+     * - 40%: 2,692.01 - 9,615.00
+     * - 42%: 9,615.01+
+     */
+public function calculateTax($employee, $grossPay)
+{
+    $taxRates = TaxRate::where('is_active', true)
+        ->where(function ($query) use ($employee) {
+            $query->where('company_id', $employee->company_id)
+                ->orWhere('is_global', true);
+        })
+        ->orderBy('min_income')
+        ->get();
 
-        $tax = 0;
-        foreach ($taxRates as $rate) {
-            if ($grossPay > $rate['min']) {
-                $taxable = $rate['max'] ? min($grossPay, $rate['max']) - $rate['min'] : $grossPay - $rate['min'];
-                $tax += $taxable * $rate['rate'];
+    if ($taxRates->isEmpty()) {
+        return $this->getDefaultTax($grossPay);
+    }
+
+    $tax = 0;
+    foreach ($taxRates as $rate) {
+        // Check if gross pay falls in this bracket
+        if ($grossPay > $rate->min_income && ($rate->max_income === null || $grossPay <= $rate->max_income)) {
+            // Calculate tax using tax_free_threshold
+            if ($grossPay > $rate->tax_free_threshold) {
+                $tax = ($grossPay - $rate->tax_free_threshold) * ($rate->rate / 100);
+            } else {
+                $tax = 0;
             }
+            break;
         }
+    }
 
-        return $tax;
+    return max(0, round($tax, 2));
+}
+
+    /**
+     * Default PNG Tax Table
+     * Used when no tax rates exist in database
+     * SAME for both National and Expatriate
+     */
+    private function getDefaultTax($grossPay)
+    {
+        // PNG Tax Table based on FN RATE (fortnightly pay)
+        // Tax-free threshold: K769.00 per fortnight
+        
+        if ($grossPay <= 769) {
+            // 0% bracket
+            return 0;
+        } elseif ($grossPay <= 1269) {
+            // 30% bracket
+            return round(($grossPay - 769) * 0.30, 2);
+        } elseif ($grossPay <= 2692) {
+            // 35% bracket
+            return round(($grossPay - 769) * 0.35, 2);
+        } elseif ($grossPay <= 9615) {
+            // 40% bracket
+            return round(($grossPay - 769) * 0.40, 2);
+        } else {
+            // 42% bracket
+            return round(($grossPay - 769) * 0.42, 2);
+        }
     }
 
     public function generateFortnightNumber($date)
@@ -82,15 +149,15 @@ class PayrollService
         return $year . str_pad($fortnight, 2, '0', STR_PAD_LEFT);
     }
 
-    public function processPayroll($companyId, $periodStart, $periodEnd)
+    public function processPayroll($companyId, $periodStart, $periodEnd, $selectedEmployees = [])
     {
-        return DB::transaction(function () use ($companyId, $periodStart, $periodEnd) {
-            $company = Company::findOrFail($companyId);
+        return DB::transaction(function () use ($companyId, $periodStart, $periodEnd, $selectedEmployees) {
+            $company = Company::on('mysql')->findOrFail($companyId);
 
             $fortnightNumber = $this->generateFortnightNumber($periodStart);
             $year = $periodStart->year;
 
-            $payroll = Payroll::forceCreate([
+            $payroll = Payroll::on('mysql')->forceCreate([
                 'company_id' => $companyId,
                 'fortnight_number' => $fortnightNumber,
                 'year' => $year,
@@ -99,9 +166,15 @@ class PayrollService
                 'status' => 'processing',
             ]);
 
-            $employees = Employee::where('company_id', $companyId)
-                ->where('is_active', true)
-                ->get();
+            $query = Employee::on('mysql')
+                ->where('company_id', $companyId)
+                ->where('is_active', true);
+
+            if (!empty($selectedEmployees)) {
+                $query->whereIn('id', $selectedEmployees);
+            }
+
+            $employees = $query->get();
 
             $totalGross = 0;
             $totalTax = 0;
@@ -112,14 +185,14 @@ class PayrollService
             foreach ($employees as $employee) {
                 $result = $this->calculatePayroll($employee, $periodStart, $periodEnd);
 
-                PayrollItem::create(array_merge($result, [
+                PayrollItem::on('mysql')->create(array_merge($result, [
                     'payroll_id' => $payroll->id,
                     'payment_method' => $employee->payment_method,
                 ]));
 
                 $totalGross += $result['gross_pay'];
                 $totalTax += $result['tax'];
-                $totalNasfundEE += $result['nasfund_ee'];
+                $totalNasfundEE += $result['ncsl'];
                 $totalNasfundER += $result['nasfund_er'];
                 $totalNet += $result['net_pay'];
             }

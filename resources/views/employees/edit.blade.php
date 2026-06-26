@@ -113,34 +113,34 @@
                                 </select>
                             </div>
 
-                            <!-- Base Salary -->
+                           <!-- Monthly Rate -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Base Salary</label>
-                                <input type="number" step="0.01" name="base_salary" value="{{ old('base_salary', $employee->base_salary) }}" 
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Monthly Rate (K)</label>
+                                <input type="number" step="0.01" name="monthly_rate" value="{{ old('monthly_rate', $employee->monthly_rate) }}" 
                                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500">
+                                @error('monthly_rate') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
 
-                            <!-- Hourly Rate -->
+                            <!-- Hourly Rate (Read Only) -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Hourly Rate</label>
-                                <input type="number" step="0.01" name="hourly_rate" value="{{ old('hourly_rate', $employee->hourly_rate) }}" 
-                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Hourly Rate (K) - Auto Calculated</label>
+                                <input type="text" value="{{ number_format($employee->hourly_rate, 2) }}" readonly 
+                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400 shadow-sm cursor-not-allowed">
                             </div>
 
-                            <!-- Allowance -->
+                            <!-- Pay Raise (Fixed Amount) -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Allowance</label>
-                                <input type="text" name="allowance" value="{{ old('allowance', $employee->allowance) }}" 
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pay Raise (K)</label>
+                                <input type="number" step="0.01" name="pay_raise" value="{{ old('pay_raise', $employee->pay_raise ?? 0) }}"  
                                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500">
+                                @error('pay_raise') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
 
-                            <!-- Default Pay -->
+                            <!-- New Monthly Rate After Raise -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Default Pay</label>
-                                <select name="default_pay" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500">
-                                    <option value="Bank" {{ old('default_pay', $employee->default_pay) == 'Bank' ? 'selected' : '' }}>Bank</option>
-                                    <option value="Cash" {{ old('default_pay', $employee->default_pay) == 'Cash' ? 'selected' : '' }}>Cash</option>
-                                </select>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">New Monthly Rate (After Raise)</label>
+                                <input type="text" value="{{ number_format(($employee->monthly_rate ?? 0) + ($employee->pay_raise ?? 0), 2) }}" readonly 
+                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400 shadow-sm cursor-not-allowed">
                             </div>
 
                             <!-- NASFUND Collect -->
@@ -174,13 +174,11 @@
                                 @if($employee->photo)
                                     <div class="mt-1 mb-2 flex items-center space-x-4">
                                         <img src="{{ asset('storage/' . $employee->photo) }}" class="h-16 w-16 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600">
-                                        <!-- Remove Photo Button -->
                                         <button type="button" onclick="document.getElementById('remove-photo').value='1'; this.style.display='none'; document.getElementById('photo-preview').style.display='none';" 
                                                 class="px-3 py-1 text-xs font-medium text-red-600 dark:text-red-400 border border-red-600 dark:border-red-400 hover:bg-red-600 hover:text-white dark:hover:bg-red-500 rounded transition">
                                             Remove Photo
                                         </button>
                                     </div>
-                                    <!-- Hidden input to signal photo removal -->
                                     <input type="hidden" name="remove_photo" id="remove-photo" value="0">
                                 @else
                                     <div class="mt-1 mb-2">
@@ -204,7 +202,6 @@
 
                         </div>
 
-                        <!-- Submit Buttons -->
                         <div class="mt-6 flex justify-end space-x-3">
                             <a href="{{ route('employees.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition">
                                 Cancel

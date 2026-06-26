@@ -15,6 +15,23 @@ class SetCompanyDatabase
     {
         $companyId = session('company_id');
 
+        // ✅ If no company in session, set a default
+        if (!$companyId && auth()->check()) {
+            $user = auth()->user();
+            if ($user->company_id) {
+                $companyId = $user->company_id;
+                session(['company_id' => $companyId]);
+                Log::info('🔍 Middleware: Set company from user: ' . $companyId);
+            } else {
+                $firstCompany = Company::first();
+                if ($firstCompany) {
+                    $companyId = $firstCompany->id;
+                    session(['company_id' => $companyId]);
+                    Log::info('🔍 Middleware: Set company to first available: ' . $companyId);
+                }
+            }
+        }
+
         Log::info('🔍 Middleware: Company ID: ' . ($companyId ?? 'NULL'));
 
         if ($companyId) {

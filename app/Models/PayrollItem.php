@@ -14,6 +14,8 @@ class PayrollItem extends Model
     protected $fillable = [
         'payroll_id',
         'employee_id',
+        'fn_rate',
+        'basic_pay',
         'regular_hours',
         'overtime_hours',
         'hourly_rate',

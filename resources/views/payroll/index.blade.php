@@ -5,7 +5,7 @@
                 {{ __('Payroll History') }}
             </h2>
             <a href="{{ route('payroll.create') }}" 
-   style="background-color: #dc2626; color: #ffffff !important; font-weight: 700; padding: 8px 16px; border-radius: 8px; text-decoration: none; display: inline-block;">
+               style="background-color: #dc2626; color: #ffffff !important; font-weight: 700; padding: 8px 16px; border-radius: 8px; text-decoration: none; display: inline-block;">
                 + Process Payroll
             </a>
         </div>
@@ -68,9 +68,7 @@
                                             <form action="{{ route('payroll.destroy', $payroll) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-800 text-sm" onclick="return confirm('Delete this payroll record?')">
-                                                    Delete
-                                                </button>
+                                                <button type="submit" class="text-red-600 hover:text-red-800 text-sm" onclick="return confirm('Delete this payroll?')">Delete</button>
                                             </form>
                                         @endif
                                     </td>
